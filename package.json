@@ -5,9 +5,13 @@
   "main": "app.js",
   "scripts": {
     "test": "jest",
-    "start": "node server.js "
+    "start": "nodemon -e js,html,css server.js "
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "pg": "^8.3.3"
+  }
 }
