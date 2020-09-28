@@ -1,0 +1,13 @@
+{
+  "name": "express-jobly",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node server.js "
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
