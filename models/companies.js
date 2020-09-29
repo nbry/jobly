@@ -1,6 +1,7 @@
 /** Comapnies class for Jobly */
 
 const db = require("../db");
+const sqlForPartialUpdate = require("../helpers/partialUpdate");
 const ExpressError = require("../helpers/expressError");
 
 class Company {
@@ -12,6 +13,7 @@ class Company {
     this.logo_url = logo_url;
   }
 
+  // STATIC METHODS
   static async getAll() {
     const results = await db.query(`SELECT * FROM companies`);
     const companies = results.rows.map((row) => {
@@ -46,22 +48,6 @@ class Company {
     }
   }
 
-  static searchParameter(companies, searchString) {
-    const search = companies.filter((c) => {
-      debugger;
-      return c.name.toLowerCase().includes(searchString.toLowerCase());
-    });
-    return search;
-  }
-
-  static filterMinEmp(companies, minEmp) {
-    return companies.filter((c) => c.num_employees >= minEmp);
-  }
-
-  static filterMaxEmp(companies, maxEmp) {
-    return companies.filter((c) => c.num_employees <= maxEmp);
-  }
-
   static async create(
     newHandle,
     newName,
@@ -84,6 +70,45 @@ class Company {
       logo_url,
     } = results.rows[0];
     return new Company(handle, name, num_employees, description, logo_url);
+  }
+
+  static searchParameter(companies, searchString) {
+    const search = companies.filter((c) => {
+      debugger;
+      return c.name.toLowerCase().includes(searchString.toLowerCase());
+    });
+    return search;
+  }
+
+  static filterMinEmp(companies, minEmp) {
+    return companies.filter((c) => c.num_employees >= minEmp);
+  }
+
+  static filterMaxEmp(companies, maxEmp) {
+    return companies.filter((c) => c.num_employees <= maxEmp);
+  }
+
+  // INSTANCE METHODS
+  async update(changesObj) {
+    let handle = this.handle;
+    for (let item in changesObj) {
+      if (item === "handle") {
+        handle = changesObj[item];
+      }
+      let change = {};
+      change[item] = changesObj[item];
+      const c = sqlForPartialUpdate("companies", change, "handle", this.handle);
+      await db.query(c.query, c.values);
+    }
+    return Company.getOne(handle);
+  }
+
+  async remove() {
+    await db.query(
+      `DELETE FROM companies
+      WHERE handle = $1`,
+      [this.handle]
+    );
   }
 }
 

@@ -28,7 +28,6 @@ router.get("/", async (req, res, next) => {
 router.post("/", async (req, res, next) => {
   try {
     const { handle, name, num_employees, description, logo_url } = req.body;
-    console.log(req.body);
     const company = await Company.create(
       handle,
       name,
@@ -44,9 +43,28 @@ router.post("/", async (req, res, next) => {
 
 router.get("/:handle", async (req, res, next) => {
   try {
-    const handle = req.params.handle;
-    const company = await Company.getOne(handle);
+    const company = await Company.getOne(req.params.handle);
     return res.json({ company });
+  } catch (e) {
+    return next(e);
+  }
+});
+
+router.patch("/:handle", async (req, res, next) => {
+  try {
+    const company = await Company.getOne(req.params.handle);
+    const updated = await company.update(req.body);
+    return res.json({ company: updated });
+  } catch (e) {
+    return next(e);
+  }
+});
+
+router.delete("/:handle", async function (req, res, next) {
+  try {
+    let company = await Company.getOne(req.params.handle);
+    await company.remove();
+    return res.json({ message: "Company deleted" });
   } catch (e) {
     return next(e);
   }
