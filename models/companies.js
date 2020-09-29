@@ -26,6 +26,42 @@ class Company {
     return companies;
   }
 
+  static async getOne(handle) {
+    const results = await db.query(
+      `SELECT * FROM companies
+      WHERE handle = $1`,
+      [handle]
+    );
+    if (results.rows.length > 0) {
+      const c = results.rows[0];
+      return new Company(
+        c.handle,
+        c.name,
+        c.num_employees,
+        c.description,
+        c.logo_url
+      );
+    } else {
+      throw new ExpressError("No company found", 404);
+    }
+  }
+
+  static searchParameter(companies, searchString) {
+    const search = companies.filter((c) => {
+      debugger;
+      return c.name.toLowerCase().includes(searchString.toLowerCase());
+    });
+    return search;
+  }
+
+  static filterMinEmp(companies, minEmp) {
+    return companies.filter((c) => c.num_employees >= minEmp);
+  }
+
+  static filterMaxEmp(companies, maxEmp) {
+    return companies.filter((c) => c.num_employees <= maxEmp);
+  }
+
   static async create(
     newHandle,
     newName,
