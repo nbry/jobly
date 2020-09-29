@@ -5,7 +5,7 @@ const ExpressError = require("./helpers/expressError");
 const morgan = require("morgan");
 const app = express();
 
-const cRoutes = require("./routes/companies");
+const cRoutes = require("./routes/companieRoutes");
 
 app.use(express.json());
 
