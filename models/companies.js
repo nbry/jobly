@@ -75,7 +75,7 @@ class Company {
       const results = await db.query(
         `INSERT INTO companies (handle, name, num_employees, description, logo_url)
       VALUES ($1, $2, $3, $4, $5)
-      RETURNING handle, name`,
+      RETURNING handle, name, num_employees, description, logo_url`,
         [newHandle, newName, newNumEmployees, newDescription, newLogoUrl]
       );
       const {
@@ -85,6 +85,7 @@ class Company {
         description,
         logo_url,
       } = results.rows[0];
+
       return new Company(handle, name, num_employees, description, logo_url);
     } catch (e) {
       if (e.code === "23505" && e.message.includes("pkey")) {
@@ -129,7 +130,8 @@ class Company {
       const c = sqlForPartialUpdate("companies", change, "handle", this.handle);
       await db.query(c.query, c.values);
     }
-    return Company.getOne(handle);
+    const updatedCompany = await Company.getOne(handle);
+    return updatedCompany;
   }
 
   async remove() {

@@ -36,7 +36,7 @@ router.post("/", async (req, res, next) => {
       description,
       logo_url
     );
-    return res.json({ company });
+    return res.status(201).json({ company });
   } catch (e) {
     return next(e);
   }
