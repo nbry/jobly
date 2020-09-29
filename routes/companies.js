@@ -27,6 +27,7 @@ router.get("/", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
+    Company.validateJson(req.body, "post");
     const { handle, name, num_employees, description, logo_url } = req.body;
     const company = await Company.create(
       handle,
@@ -52,6 +53,7 @@ router.get("/:handle", async (req, res, next) => {
 
 router.patch("/:handle", async (req, res, next) => {
   try {
+    Company.validateJson(req.body, "patch");
     const company = await Company.getOne(req.params.handle);
     const updated = await company.update(req.body);
     return res.json({ company: updated });
