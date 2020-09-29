@@ -1,9 +1,9 @@
 process.env.NODE_ENV = "test";
 
 const request = require("supertest");
-const app = require("../app");
-const db = require("../db");
-const Company = require("../models/companies");
+const app = require("../../app");
+const db = require("../../db");
+const Company = require("../../models/companies");
 
 let testCompany;
 
@@ -71,7 +71,6 @@ describe("GET /companies/:handle", () => {
           num_employees: 3,
         });
       expect(res.statusCode).toBe(200);
-      console.log(res.body);
       expect(res.body).toEqual({
         company: {
           handle: "tc",
