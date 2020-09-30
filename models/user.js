@@ -20,7 +20,7 @@ class User {
       `SELECT username, first_name, last_name, email, photo_url, is_admin FROM users`
     );
     const users = results.rows.map((row) => {
-      return new User(
+      let u = new User(
         row.username,
         row.first_name,
         row.last_name,
@@ -28,6 +28,12 @@ class User {
         row.photo_url,
         row.is_admin
       );
+      return {
+        username: u.username,
+        first_name: u.first_name,
+        Last_name: u.last_name,
+        email: u.email,
+      };
     });
     return users;
   }
@@ -60,15 +66,23 @@ class User {
     newPassword,
     newFirstName,
     newLastName,
+    newEmail,
     newPhotoUrl = "no image"
   ) {
     try {
       const results = await db.query(
-        `INSERT INTO users (username, password, first_name, last_name, photo_url)
-      VALUES ($1, $2, $3, $4, $5)
+        `INSERT INTO users (username, password, first_name, last_name, email, photo_url)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING username, password, first_name, last_name, photo_url, is_admin`,
         //   CHANGE THIS!!!
-        [newUsername, newPassword, newFirstName, newLastName, newPhotoUrl]
+        [
+          newUsername,
+          newPassword,
+          newFirstName,
+          newLastName,
+          newEmail,
+          newPhotoUrl,
+        ]
       );
       const {
         username,
@@ -117,15 +131,15 @@ class User {
         let change = {};
         change[item] = changesObj[item];
         const c = sqlForPartialUpdate(
-          "jobs",
+          "users",
           change,
           "username",
           this.username
         );
         await db.query(c.query, c.values);
       }
-      const updatedJob = await Job.getOne(username);
-      return updatedJob;
+      const updatedUser = await User.getOne(username);
+      return updatedUser;
     } catch (e) {
       // CHANGE THIS!!!!!
       return e;
