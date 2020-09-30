@@ -74,6 +74,27 @@ class Job {
     }
   }
 
+  static async jobQuerySearch(search) {
+    const results = await db.query(
+      `SELECT id, title, salary, equity, company_handle, date_posted
+      FROM jobs
+      WHERE title ILIKE '%'||$1||'%' OR company_handle ILIKE '%'||$1||'%'`,
+      [search]
+    );
+
+    const jobs = results.rows.map((row) => {
+      return new Job(
+        row.id,
+        row.title,
+        row.salary,
+        row.equity,
+        row.company_handle,
+        row.date_posted
+      );
+    });
+    return jobs;
+  }
+
   static parseSqlError(e) {
     if (e.message.includes("equity")) {
       return new ExpressError(

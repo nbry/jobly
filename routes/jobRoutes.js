@@ -9,7 +9,7 @@ router.get("/", async (req, res, next) => {
     if (req.query) {
       const q = req.query;
       if (q.search) {
-        jobs = General.searchParameter(jobs, "title", q.search);
+        jobs = await Job.jobQuerySearch(q.search);
       }
       if (q.min_salary) {
         jobs = General.filterMin(jobs, "salary", q.min_salary);
@@ -30,6 +30,26 @@ router.post("/", async (req, res, next) => {
     const { title, salary, equity, company_handle } = req.body;
     const job = await Job.create(title, salary, equity, company_handle);
     return res.status(201).json({ job });
+  } catch (e) {
+    return next(e);
+  }
+});
+
+router.get("/:id", async (req, res, next) => {
+  try {
+    const job = await Job.getOne(req.params.id);
+    return res.json({ job });
+  } catch (e) {
+    return next(e);
+  }
+});
+
+router.patch("/:id", async (req, res, next) => {
+  try {
+    General.validateJson(req.body, "jobPatch");
+    const job = await Job.getOne(req.params.id);
+    const updated = await job.update(req.body);
+    return res.json({ job: updated });
   } catch (e) {
     return next(e);
   }
