@@ -68,32 +68,42 @@ class Job {
         date_posted,
       } = results.rows[0];
 
-      return new Job(
-        id,
-        title,
-        salary,
-        equity,
-        company_handle,
-        date_posted
-      );
+      return new Job(id, title, salary, equity, company_handle, date_posted);
     } catch (e) {
-      throw e;
+      return Job.parseSqlError(e);
+    }
+  }
+
+  static parseSqlError(e) {
+    if (e.message.includes("equity")) {
+      return new ExpressError(
+        "equity must be a number between 0.0 and 1.0",
+        400
+      );
+    } else if (e.message.includes("handle")) {
+      return new ExpressError(`${e.message}`, 400);
+    } else if (e.message.includes("salary")) {
+      return new ExpressError("salary must be a positive number", 400);
     }
   }
 
   // INSTANCE METHODS
   async update(changesObj) {
-    for (let item in changesObj) {
-      if (item === "id") {
-        return new ExpressError("Not allowed to change id", 400);
+    try {
+      for (let item in changesObj) {
+        if (item === "id") {
+          return new ExpressError("Not allowed to change id", 400);
+        }
+        let change = {};
+        change[item] = changesObj[item];
+        const j = sqlForPartialUpdate("jobs", change, "id", this.id);
+        await db.query(j.query, j.values);
       }
-      let change = {};
-      change[item] = changesObj[item];
-      const j = sqlForPartialUpdate("jobs", change, "id", this.id);
-      await db.query(j.query, j.values);
+      const updatedJob = await Job.getOne(this.id);
+      return updatedJob;
+    } catch (e) {
+      return Job.parseSqlError(e);
     }
-    const updatedJob = await Job.getOne(this.id);
-    return updatedJob;
   }
 
   async remove() {

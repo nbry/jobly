@@ -12,10 +12,10 @@ router.get("/", async (req, res, next) => {
         jobs = General.searchParameter(jobs, "title", q.search);
       }
       if (q.min_salary) {
-        jobs = General.filterMinEmp(jobs, salary, q.min_salary);
+        jobs = General.filterMin(jobs, "salary", q.min_salary);
       }
       if (q.max_salary) {
-        jobs = General.filterMaxEmp(jobs, salary, q.max_salary);
+        jobs = General.filterMax(jobs, "salary", q.max_salary);
       }
     }
     return res.json({ jobs });
