@@ -26,7 +26,7 @@ router.get("/", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    // General.validateJson(req.body, "jobPost");
+    General.validateJson(req.body, "jobPost");
     const { title, salary, equity, company_handle } = req.body;
     const job = await Job.create(title, salary, equity, company_handle);
     return res.status(201).json({ job });

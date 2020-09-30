@@ -75,34 +75,47 @@ class Company {
 
       return new Company(handle, name, num_employees, description, logo_url);
     } catch (e) {
-      if (e.code === "23505" && e.message.includes("pkey")) {
-        return new ExpressError(
-          "Company **handle** already exists. Choose another",
-          400
-        );
-      } else if (e.code === "23505" && e.message.includes("name")) {
-        return new ExpressError(
-          "Company **name** already exists. Choose another",
-          400
-        );
-      }
+      return Company.parseSqlError(e);
+    }
+  }
+
+  static parseSqlError(e) {
+    if (e.code === "23505" && e.message.includes("pkey")) {
+      return new ExpressError(
+        "Company **handle** already exists. Choose another",
+        400
+      );
+    } else if (e.code === "23505" && e.message.includes("name")) {
+      return new ExpressError(
+        "Company **name** already exists. Choose another",
+        400
+      );
     }
   }
 
   // INSTANCE METHODS
   async update(changesObj) {
-    let handle = this.handle;
-    for (let item in changesObj) {
-      if (item === "handle") {
-        handle = changesObj[item];
+    try {
+      let handle = this.handle;
+      for (let item in changesObj) {
+        if (item === "handle") {
+          handle = changesObj[item];
+        }
+        let change = {};
+        change[item] = changesObj[item];
+        const c = sqlForPartialUpdate(
+          "companies",
+          change,
+          "handle",
+          this.handle
+        );
+        await db.query(c.query, c.values);
       }
-      let change = {};
-      change[item] = changesObj[item];
-      const c = sqlForPartialUpdate("companies", change, "handle", this.handle);
-      await db.query(c.query, c.values);
+      const updatedCompany = await Company.getOne(handle);
+      return updatedCompany;
+    } catch (e) {
+      return Company.parseSqlError(e);
     }
-    const updatedCompany = await Company.getOne(handle);
-    return updatedCompany;
   }
 
   async remove() {

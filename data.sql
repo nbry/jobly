@@ -10,7 +10,7 @@ CREATE TABLE companies (
 CREATE TABLE jobs (
   id SERIAL PRIMARY KEY,
   title TEXT NOT NULL,
-  salary NUMERIC NOT NULL,
+  salary NUMERIC NOT NULL CHECK(salary > 0),
   equity NUMERIC(2, 1) CHECK(
     equity >= 0
     AND equity <= 1
