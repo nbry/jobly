@@ -47,7 +47,7 @@ class Company {
         c.logo_url
       );
     } else {
-      throw new ExpressError("No company found", 404);
+      throw new ExpressError(`No company found with handle of ${handle}`, 404);
     }
   }
 

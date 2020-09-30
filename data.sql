@@ -18,3 +18,13 @@ CREATE TABLE jobs (
   company_handle TEXT REFERENCES companies(handle) ON DELETE CASCADE,
   date_posted DATE DEFAULT CURRENT_DATE
 );
+
+CREATE TABLE users (
+  username VARCHAR(15) PRIMARY KEY,
+  password TEXT NOT NULL,
+  first_name VARCHAR(25) NOT NULL,
+  last_name VARCHAR(25) NOT NULL,
+  email TEXT NOT NULL UNIQUE,
+  photo_url TEXT,
+  is_admin BOOLEAN DEFAULT FALSE
+);

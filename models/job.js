@@ -47,7 +47,7 @@ class Job {
         j.date_posted
       );
     } else {
-      throw new ExpressError("No job found", 404);
+      throw new ExpressError(`No job found with id of ${id}`, 404);
     }
   }
 
