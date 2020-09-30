@@ -1,25 +1,24 @@
 const express = require("express");
 const router = new express.Router();
-const ExpressError = require("../helpers/expressError");
-const db = require("../db");
 const Job = require("../models/job");
+const General = require("../models/general");
 
 router.get("/", async (req, res, next) => {
   try {
-    let companies = await Company.getAll();
+    let jobs = await Job.getAll();
     if (req.query) {
       const q = req.query;
       if (q.search) {
-        companies = Company.searchParameter(companies, q.search);
+        jobs = General.searchParameter(jobs, "title", q.search);
       }
-      if (q.min_employees) {
-        companies = Company.filterMinEmp(companies, q.min_employees);
+      if (q.min_salary) {
+        jobs = General.filterMinEmp(jobs, salary, q.min_salary);
       }
-      if (q.max_employees) {
-        companies = Company.filterMaxEmp(companies, q.max_employees);
+      if (q.max_salary) {
+        jobs = General.filterMaxEmp(jobs, salary, q.max_salary);
       }
     }
-    return res.json({ companies });
+    return res.json({ jobs });
   } catch (e) {
     return next(e);
   }

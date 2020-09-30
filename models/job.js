@@ -3,9 +3,6 @@
 const db = require("../db");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
 const ExpressError = require("../helpers/expressError");
-const jsonschema = require("jsonschema");
-const patchSchema = require("../schemas/companyPatch.json");
-const postSchema = require("../schemas/companyPost.json");
 
 class Job {
   constructor(id, title, salary, equity, company_handle, date_posted) {
@@ -86,25 +83,24 @@ class Job {
 
   // INSTANCE METHODS
   async update(changesObj) {
-    let handle = this.handle;
     for (let item in changesObj) {
-      if (item === "handle") {
-        handle = changesObj[item];
+      if (item === "id") {
+        return new ExpressError("Not allowed to change id", 400);
       }
       let change = {};
       change[item] = changesObj[item];
-      const c = sqlForPartialUpdate("companies", change, "handle", this.handle);
-      await db.query(c.query, c.values);
+      const j = sqlForPartialUpdate("jobs", change, "id", this.id);
+      await db.query(j.query, j.values);
     }
-    const updatedCompany = await Company.getOne(handle);
-    return updatedCompany;
+    const updatedJob = await Job.getOne(this.id);
+    return updatedJob;
   }
 
   async remove() {
     await db.query(
-      `DELETE FROM companies
-      WHERE handle = $1`,
-      [this.handle]
+      `DELETE FROM jobs
+      WHERE id = $1`,
+      [this.id]
     );
   }
 }

@@ -9,7 +9,7 @@ router.get("/", async (req, res, next) => {
     if (req.query) {
       const q = req.query;
       if (q.search) {
-        companies = General.searchParameter(companies, q.search);
+        companies = General.searchParameter(companies, "name", q.search);
       }
       if (q.min_employees) {
         companies = General.filterMin(
@@ -60,7 +60,7 @@ router.get("/:handle", async (req, res, next) => {
 
 router.patch("/:handle", async (req, res, next) => {
   try {
-    Company.validateJson(req.body, "patch");
+    General.validateJson(req.body, "companyPatch");
     const company = await Company.getOne(req.params.handle);
     const updated = await company.update(req.body);
     return res.json({ company: updated });

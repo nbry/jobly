@@ -1,4 +1,4 @@
-/** Comapnies class for Jobly */
+/** Company class for Jobly */
 
 const db = require("../db");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");

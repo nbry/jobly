@@ -4,9 +4,9 @@ const ExpressError = require("../helpers/expressError");
 const jsonschema = require("jsonschema");
 
 class General {
-  static searchParameter(arrayOfObjects, searchString) {
+  static searchParameter(arrayOfObjects, filterParam, searchString) {
     const search = arrayOfObjects.filter((j) => {
-      return j.name.toLowerCase().includes(searchString.toLowerCase());
+      return j[filterParam].toLowerCase().includes(searchString.toLowerCase());
     });
     return search;
   }
