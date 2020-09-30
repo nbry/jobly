@@ -55,4 +55,14 @@ router.patch("/:id", async (req, res, next) => {
   }
 });
 
+router.delete("/:id", async function (req, res, next) {
+  try {
+    let job = await Job.getOne(req.params.id);
+    await job.remove();
+    return res.json({ message: "Job deleted" });
+  } catch (e) {
+    return next(e);
+  }
+});
+
 module.exports = router;
