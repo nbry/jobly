@@ -102,23 +102,17 @@ class User {
         is_admin
       );
     } catch (e) {
-      // CHANGE THIS:
-      return e;
+      User.parseSqlError(e)
     }
   }
 
-  //   static parseSqlError(e) {
-  //     if (e.message.includes("equity")) {
-  //       return new ExpressError(
-  //         "equity must be a number between 0.0 and 1.0",
-  //         400
-  //       );
-  //     } else if (e.message.includes("handle")) {
-  //       return new ExpressError(`${e.message}`, 400);
-  //     } else if (e.message.includes("salary")) {
-  //       return new ExpressError("salary must be a positive number", 400);
-  //     }
-  //   }
+  static parseSqlError(e) {
+    if (e.code === "23505" && e.message.includes("pkey")) {
+      throw new ExpressError("username already exists. Choose another", 400);
+    } else if (e.code === "23505" && e.message.includes("email")) {
+      throw new ExpressError("email already exists. Choose another", 400);
+    }
+  }
 
   // INSTANCE METHODS
   async update(changesObj) {
@@ -141,8 +135,7 @@ class User {
       const updatedUser = await User.getOne(username);
       return updatedUser;
     } catch (e) {
-      // CHANGE THIS!!!!!
-      return e;
+      User.parseSqlError(e)
     }
   }
 

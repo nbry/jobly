@@ -14,7 +14,7 @@ router.get("/", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    //   General.validateJson(req.body, "userPost");
+    General.validateJson(req.body, "userPost");
     const {
       username,
       password,
@@ -32,6 +32,26 @@ router.post("/", async (req, res, next) => {
       photo_url
     );
     return res.status(201).json({ user });
+  } catch (e) {
+    return next(e);
+  }
+});
+
+router.get("/:username", async (req, res, next) => {
+  try {
+    const user = await User.getOne(req.params.username);
+    return res.json({ user });
+  } catch (e) {
+    return next(e);
+  }
+});
+
+router.patch("/:username", async (req, res, next) => {
+  try {
+    General.validateJson(req.body, "userPatch");
+    const user = await User.getOne(req.params.username);
+    const updated = await user.update(req.body);
+    return res.json({ user: updated });
   } catch (e) {
     return next(e);
   }
