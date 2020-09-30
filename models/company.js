@@ -14,6 +14,7 @@ class Company {
     this.num_employees = num_employees;
     this.description = description;
     this.logo_url = logo_url;
+    this.jobs = 0;
   }
 
   // STATIC METHODS
@@ -33,19 +34,30 @@ class Company {
 
   static async getOne(handle) {
     const results = await db.query(
-      `SELECT * FROM companies
-      WHERE handle = $1`,
+      `SELECT c.handle, c.name, c.num_employees, c.description, c.logo_url, j.id, j.title 
+      FROM companies AS c
+      LEFT JOIN jobs AS j
+      ON c.handle = j.company_handle
+      WHERE c.handle = $1`,
       [handle]
     );
+
     if (results.rows.length > 0) {
       const c = results.rows[0];
-      return new Company(
+      const company = new Company(
         c.handle,
         c.name,
         c.num_employees,
         c.description,
-        c.logo_url
+        c.logo_url,
+        c.title
       );
+      let jobs = [];
+      for (let row of results.rows) {
+        jobs.push({ id: row.id, title: row.title });
+      }
+      company.jobs = jobs;
+      return company;
     } else {
       throw new ExpressError(`No company found with handle of ${handle}`, 404);
     }
