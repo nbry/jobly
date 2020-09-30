@@ -55,8 +55,8 @@ class Job {
     try {
       const results = await db.query(
         `INSERT INTO jobs (title, salary, equity, company_handle)
-      VALUES ($1, $2, $3, $4, $5)
-      RETURNING title, salary, equity, company_handle`,
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, title, salary, equity, company_handle, date_posted`,
         [newTitle, newSalary, newEquity, newCompany_handle]
       );
       const {
@@ -68,7 +68,7 @@ class Job {
         date_posted,
       } = results.rows[0];
 
-      return new Company(
+      return new Job(
         id,
         title,
         salary,
@@ -77,7 +77,7 @@ class Job {
         date_posted
       );
     } catch (e) {
-      return e;
+      throw e;
     }
   }
 
