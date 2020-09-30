@@ -54,19 +54,6 @@ class Job {
     }
   }
 
-  //   static validateJson(json, type) {
-  //     let result;
-  //     if (type === "post") {
-  //       result = jsonschema.validate(json, postSchema);
-  //     } else if (type === "patch") {
-  //       result = jsonschema.validate(json, patchSchema);
-  //     }
-  //     if (!result.valid) {
-  //       const listOfErrors = result.errors.map((e) => e.stack);
-  //       throw new ExpressError(listOfErrors, 400);
-  //     }
-  //   }
-
   static async create(newTitle, newSalary, newEquity, newCompany_handle) {
     try {
       const results = await db.query(

@@ -34,7 +34,7 @@ router.get("/", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    Company.validateJson(req.body, "post");
+    General.validateJson(req.body, "companyPost");
     const { handle, name, num_employees, description, logo_url } = req.body;
     const company = await Company.create(
       handle,
