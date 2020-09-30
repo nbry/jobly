@@ -102,22 +102,6 @@ class Company {
     }
   }
 
-  static searchParameter(companies, searchString) {
-    const search = companies.filter((c) => {
-      debugger;
-      return c.name.toLowerCase().includes(searchString.toLowerCase());
-    });
-    return search;
-  }
-
-  static filterMinEmp(companies, minEmp) {
-    return companies.filter((c) => c.num_employees >= minEmp);
-  }
-
-  static filterMaxEmp(companies, maxEmp) {
-    return companies.filter((c) => c.num_employees <= maxEmp);
-  }
-
   // INSTANCE METHODS
   async update(changesObj) {
     let handle = this.handle;

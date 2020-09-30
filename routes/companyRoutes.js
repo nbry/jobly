@@ -1,6 +1,7 @@
 const express = require("express");
 const router = new express.Router();
 const Company = require("../models/company");
+const General = require("../models/general");
 
 router.get("/", async (req, res, next) => {
   try {
@@ -8,13 +9,21 @@ router.get("/", async (req, res, next) => {
     if (req.query) {
       const q = req.query;
       if (q.search) {
-        companies = Company.searchParameter(companies, q.search);
+        companies = General.searchParameter(companies, q.search);
       }
       if (q.min_employees) {
-        companies = Company.filterMinEmp(companies, q.min_employees);
+        companies = General.filterMin(
+          companies,
+          num_employees,
+          q.min_employees
+        );
       }
       if (q.max_employees) {
-        companies = Company.filterMaxEmp(companies, q.max_employees);
+        companies = General.filterMax(
+          companies,
+          num_employees,
+          q.max_employees
+        );
       }
     }
     return res.json({ companies });

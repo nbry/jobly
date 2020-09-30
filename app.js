@@ -5,7 +5,8 @@ const ExpressError = require("./helpers/expressError");
 const morgan = require("morgan");
 const app = express();
 
-const cRoutes = require("./routes/companieRoutes");
+const cRoutes = require("./routes/companyRoutes");
+const jRoutes = require("./routes/jobRoutes");
 
 app.use(express.json());
 
@@ -14,6 +15,7 @@ app.use(morgan("tiny"));
 
 //routes
 app.use("/companies", cRoutes);
+app.use("/jobs", jRoutes);
 
 /** 404 handler */
 
