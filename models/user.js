@@ -118,7 +118,10 @@ class User {
       );
       debugger;
       const u = results.rows[0];
-      const token = jwt.sign({ username: u.username }, SECRET_KEY);
+      const token = jwt.sign(
+        { username: u.username, is_admin: u.is_admin },
+        SECRET_KEY
+      );
       return token;
     } catch (e) {
       User.parseSqlError(e);
@@ -139,6 +142,7 @@ class User {
   async update(changesObj) {
     try {
       let username = this.username;
+      delete changesObj._token;
       for (let item in changesObj) {
         if (item === "username") {
           username = changesObj[item];
@@ -151,6 +155,7 @@ class User {
           "username",
           this.username
         );
+
         await db.query(c.query, c.values);
       }
       const updatedUser = await User.getOne(username);

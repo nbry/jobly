@@ -2,8 +2,9 @@ const express = require("express");
 const router = new express.Router();
 const Job = require("../models/job");
 const General = require("../models/general");
+const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 
-router.get("/", async (req, res, next) => {
+router.get("/", ensureLoggedIn, async (req, res, next) => {
   try {
     let jobs = await Job.getAll();
     if (req.query) {
@@ -24,7 +25,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", ensureAdmin, async (req, res, next) => {
   try {
     General.validateJson(req.body, "jobPost");
     const { title, salary, equity, company_handle } = req.body;
@@ -35,7 +36,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.get("/:id", async (req, res, next) => {
+router.get("/:id", ensureLoggedIn, async (req, res, next) => {
   try {
     const job = await Job.getOne(req.params.id);
     return res.json({ job });
@@ -44,7 +45,7 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-router.patch("/:id", async (req, res, next) => {
+router.patch("/:id", ensureAdmin, async (req, res, next) => {
   try {
     General.validateJson(req.body, "jobPatch");
     const job = await Job.getOne(req.params.id);
@@ -55,7 +56,7 @@ router.patch("/:id", async (req, res, next) => {
   }
 });
 
-router.delete("/:id", async function (req, res, next) {
+router.delete("/:id", ensureAdmin, async function (req, res, next) {
   try {
     let job = await Job.getOne(req.params.id);
     await job.remove();

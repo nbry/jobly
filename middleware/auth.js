@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
-const ExpressError = require("../helpers/expressError");
+const User = require("../models/user");
+
+// const ExpressError = require("../helpers/expressError");
 
 /** Middleware: Authenticate user. */
 
@@ -9,6 +11,7 @@ function authenticateJWT(req, res, next) {
     const tokenFromBody = req.body._token;
     const payload = jwt.verify(tokenFromBody, SECRET_KEY);
     req.user = payload;
+    next();
   } catch (e) {
     return next();
   }
@@ -38,10 +41,26 @@ function ensureCorrectUser(req, res, next) {
     return next({ status: 401, message: "Unauthorized" });
   }
 }
-// end
+
+async function ensureAdmin(req, res, next) {
+  try {
+    const user = await User.getOne(req.user.username);
+    if (user.is_admin) {
+      return next();
+    } else {
+      return next({
+        status: 401,
+        message: "You do not have admin permissions",
+      });
+    }
+  } catch (e) {
+    return next({ status: 401, message: "You do not have admin permissions" });
+  }
+}
 
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
   ensureCorrectUser,
+  ensureAdmin,
 };

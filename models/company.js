@@ -3,9 +3,6 @@
 const db = require("../db");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
 const ExpressError = require("../helpers/expressError");
-const jsonschema = require("jsonschema");
-const patchSchema = require("../schemas/companyPatch.json");
-const postSchema = require("../schemas/companyPost.json");
 
 class Company {
   constructor(handle, name, num_employees, description, logo_url) {
@@ -111,6 +108,7 @@ class Company {
   async update(changesObj) {
     try {
       let handle = this.handle;
+      delete changesObj._token;
       for (let item in changesObj) {
         if (item === "handle") {
           handle = changesObj[item];

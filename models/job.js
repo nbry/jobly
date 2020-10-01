@@ -111,6 +111,7 @@ class Job {
   // INSTANCE METHODS
   async update(changesObj) {
     try {
+      delete changesObj._token;
       for (let item in changesObj) {
         if (item === "id") {
           return new ExpressError("Not allowed to change id", 400);

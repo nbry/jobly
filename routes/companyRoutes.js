@@ -2,8 +2,9 @@ const express = require("express");
 const router = new express.Router();
 const Company = require("../models/company");
 const General = require("../models/general");
+const { ensureLoggedIn, ensureAdmin } = require("../middleware/auth");
 
-router.get("/", async (req, res, next) => {
+router.get("/", ensureLoggedIn, async (req, res, next) => {
   try {
     let companies = await Company.getAll();
     if (req.query) {
@@ -32,7 +33,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/", ensureAdmin, async (req, res, next) => {
   try {
     General.validateJson(req.body, "companyPost");
     const { handle, name, num_employees, description, logo_url } = req.body;
@@ -49,7 +50,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.get("/:handle", async (req, res, next) => {
+router.get("/:handle", ensureLoggedIn, async (req, res, next) => {
   try {
     const company = await Company.getOne(req.params.handle);
     return res.json({ company });
@@ -58,7 +59,7 @@ router.get("/:handle", async (req, res, next) => {
   }
 });
 
-router.patch("/:handle", async (req, res, next) => {
+router.patch("/:handle", ensureAdmin, async (req, res, next) => {
   try {
     General.validateJson(req.body, "companyPatch");
     const company = await Company.getOne(req.params.handle);
@@ -69,7 +70,7 @@ router.patch("/:handle", async (req, res, next) => {
   }
 });
 
-router.delete("/:handle", async function (req, res, next) {
+router.delete("/:handle", ensureAdmin, async function (req, res, next) {
   try {
     let company = await Company.getOne(req.params.handle);
     await company.remove();
