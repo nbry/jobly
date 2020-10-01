@@ -23,7 +23,7 @@ router.post("/", async (req, res, next) => {
       email,
       photo_url,
     } = req.body;
-    const user = await User.create(
+    const token = await User.register(
       username,
       password,
       first_name,
@@ -31,7 +31,8 @@ router.post("/", async (req, res, next) => {
       email,
       photo_url
     );
-    return res.status(201).json({ user });
+
+    return res.json({ token });
   } catch (e) {
     return next(e);
   }

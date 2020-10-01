@@ -102,6 +102,8 @@ class Company {
         "Company **name** already exists. Choose another",
         400
       );
+    } else {
+      throw new ExpressError(e.message, 500);
     }
   }
 

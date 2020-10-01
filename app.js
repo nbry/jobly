@@ -3,18 +3,24 @@
 const express = require("express");
 const ExpressError = require("./helpers/expressError");
 const morgan = require("morgan");
+const { authenticateJWT } = require("./middleware/auth");
 const app = express();
 
+const aRoutes = require("./routes/authRoutes");
 const cRoutes = require("./routes/companyRoutes");
 const jRoutes = require("./routes/jobRoutes");
 const uRoutes = require("./routes/userRoutes");
 
 app.use(express.json());
 
+// get auth token for all routes
+app.use(authenticateJWT);
+
 // add logging system
 app.use(morgan("tiny"));
 
 //routes
+app.use("/", aRoutes);
 app.use("/companies", cRoutes);
 app.use("/jobs", jRoutes);
 app.use("/users", uRoutes);

@@ -3,6 +3,9 @@
 const db = require("../db");
 const sqlForPartialUpdate = require("../helpers/partialUpdate");
 const ExpressError = require("../helpers/expressError");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { SECRET_KEY, BCRYPT_WORK_FACTOR } = require("../config");
 
 class User {
   constructor(username, first_name, last_name, email, photo_url, is_admin) {
@@ -15,6 +18,34 @@ class User {
   }
 
   // STATIC METHODS
+  static async authenticate(username, password) {
+    try {
+      // if username or password empty...
+      if (!username || !password) {
+        throw new ExpressError("Username and password required", 400);
+      }
+
+      // find user
+      const results = await db.query(
+        `SELECT username, password
+        FROM users
+        WHERE username = $1`,
+        [username]
+      );
+
+      // authenticate and return boolean
+      const user = results.rows[0];
+      if (user) {
+        if (await bcrypt.compare(password, user.password)) {
+          const token = jwt.sign({ username }, SECRET_KEY);
+          return token;
+        }
+      }
+    } catch (e) {
+      throw new ExpressError(e.message, 500);
+    }
+  }
+
   static async getAll() {
     const results = await db.query(
       `SELECT username, first_name, last_name, email, photo_url, is_admin FROM users`
@@ -60,16 +91,17 @@ class User {
     }
   }
 
-  static async create(
+  static async register(
     newUsername,
-    // CHANGE THIS!!!
     newPassword,
     newFirstName,
     newLastName,
     newEmail,
     newPhotoUrl = "no image"
   ) {
+    debugger;
     try {
+      const hashedPass = await bcrypt.hash(newPassword, BCRYPT_WORK_FACTOR);
       const results = await db.query(
         `INSERT INTO users (username, password, first_name, last_name, email, photo_url)
       VALUES ($1, $2, $3, $4, $5, $6)
@@ -77,32 +109,19 @@ class User {
         //   CHANGE THIS!!!
         [
           newUsername,
-          newPassword,
+          hashedPass,
           newFirstName,
           newLastName,
           newEmail,
           newPhotoUrl,
         ]
       );
-      const {
-        username,
-        first_name,
-        last_name,
-        email,
-        photo_url,
-        is_admin,
-      } = results.rows[0];
-
-      return new User(
-        username,
-        first_name,
-        last_name,
-        email,
-        photo_url,
-        is_admin
-      );
+      debugger;
+      const u = results.rows[0];
+      const token = jwt.sign({ username: u.username }, SECRET_KEY);
+      return token;
     } catch (e) {
-      User.parseSqlError(e)
+      User.parseSqlError(e);
     }
   }
 
@@ -111,6 +130,8 @@ class User {
       throw new ExpressError("username already exists. Choose another", 400);
     } else if (e.code === "23505" && e.message.includes("email")) {
       throw new ExpressError("email already exists. Choose another", 400);
+    } else {
+      throw new ExpressError(e.message, 500);
     }
   }
 
@@ -135,7 +156,7 @@ class User {
       const updatedUser = await User.getOne(username);
       return updatedUser;
     } catch (e) {
-      User.parseSqlError(e)
+      User.parseSqlError(e);
     }
   }
 
